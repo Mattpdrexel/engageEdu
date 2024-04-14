@@ -11,6 +11,10 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 def generate_response(video_transcript_data):
     client = OpenAI(api_key=openai_api_key)
 
+    # Test if number of token is too high
+    print(len(video_transcript_data))
+
+
     messages = [
     {
         "role": "user",
