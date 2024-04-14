@@ -8,13 +8,16 @@ from question import extract_questions
 video_link_dict = {"main": "https://www.youtube.com/watch?v=kzJZWO21PVw&t",
                    "main_short": "https://www.youtube.com/shorts/vfbIOZgTers",
                    "low_quality": "https://www.youtube.com/watch?v=u3wxPCWcDiA&t",
-                   "anqie": "https://www.youtube.com/watch?v=Se5WXQ9Hqhw"}
+                   "anqie": "https://www.youtube.com/watch?v=Se5WXQ9Hqhw",
+                   "long_lecture": "https://www.youtube.com/watch?v=NNnIGh9g6fA",
+                   "counting_puzzle": "https://www.youtube.com/watch?v=HEfHFsfGXjs"}
 
 # Extract video ID from link
-video_id = extract_video_id(video_link_dict["main"])
+video_id = extract_video_id(video_link_dict["long_lecture"])
 
 # Fetch video transcript
 video_transcript_data = get_video_transcript(video_id)
+print(video_transcript_data)
 
 # Create loop to try to extract data up to 3 times
 max_attempts = 3
