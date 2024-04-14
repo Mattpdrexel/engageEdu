@@ -14,19 +14,20 @@ YouTube videos often contain valuable information delivered through speech or te
 - Utilizes OpenAI's GPT-4 model to process transcript data and generate responses.
 - Parses the response to identify and extract questions embedded within the video.
 - Saves the extracted questions in JSON format for further analysis or integration with other applications.
+- Uses FastAPI to create a RESTful API for generating question responses.
 
 ## Installation
 
 1. Clone the repository to your local machine:
 git clone https://github.com/Mattpdrexel/engageEdu.git
 
-2. Install the required dependencies
+2. Install the required dependencies:
 pip install -r requirements.txt
 
 3. Create a `.env` file in the project directory and add your API keys.
 
-4. Run the `main.py` script to extract questions from a YouTube video:
-python main.py
+4. Run the FastAPI server to start the API:
+uvicorn main:app --reload
 
 
 ## Dependencies
@@ -34,13 +35,10 @@ python main.py
 - `youtube_transcript_api`: Fetches video transcript data from YouTube.
 - `openai`: Accesses the GPT-4 model for generating responses.
 - `python-dotenv`: Loads environment variables from a `.env` file.
+- `fastapi`: Creates the RESTful API for generating question responses.
+- `uvicorn`: Runs the FastAPI server.
 
 ## Usage
 
-- Replace the `video_link_dict` variable with the URLs of the YouTube videos from which you want to extract questions.
+- Use the API endpoints provided by FastAPI to interact with the engageEdu system and generate questions from YouTube videos.
 - Customize the `extract_questions` function in the `question.py` file to suit your specific needs for question extraction.
-- Adjust the `max_attempts` variable in the `main.py` file to control the maximum number of attempts to extract questions from the video transcript.
-
-## Contributions
-
-Contributions are welcome! Feel free to submit bug reports, feature requests, or pull requests to help improve this project.
