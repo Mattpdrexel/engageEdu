@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video with Questions</title>
+    <style>
+        .popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="youtube-video">
+        <!-- Replace 'VIDEO_ID' with your YouTube video ID -->
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/kzJZWO21PVw?si=AzdRtmBvEaKhqt_W" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Load the questions from the JSON file
+            fetch('questions.json')
+                .then(response => response.json())
+                .then(questions => {
+                    // Initialize variables
+                    let popups = [];
+
+                    // Iterate over each question
+                    questions.forEach(question => {
+                        // Create a popup for each question
+                        const popup = createQuestionPopup(question);
+                        popups.push(popup);
+                    });
+
+                    // Reset the counter and clear existing popups when the page is refreshed
+                    window.addEventListener('beforeunload', function() {
+                        resetCounter();
+                        clearPopups();
+                    });
+
+                    // Function to create a popup for each question
+                    function createQuestionPopup(question) {
+                        // Create a popup element
+                        const popup = document.createElement('div');
+                        popup.classList.add('popup');
+                        popup.innerHTML = `
+                            <h2>Question ${question.index}</h2>
+                            <p>${question.question}</p>
+                            <p>Question Type: ${question.question_type}</p>
+                            <p>Options: ${question.options.join(', ')}</p>
+                        `;
+
+                        // Calculate the time in seconds
+                        const timestampInSeconds = parseFloat(question.timestamp);
+
+                        // Set a timeout to show the popup at the specified timestamp
+                        setTimeout(() => {
+                            document.body.appendChild(popup);
+                            // Remove the popup after 5 seconds
+                            setTimeout(() => {
+                                popup.remove();
+                            }, 5000);
+                        }, timestampInSeconds * 1000); // Convert seconds to milliseconds
+
+                        return popup;
+                    }
+
+                    // Function to reset the counter
+                    function resetCounter() {
+                        popups.forEach(popup => popup.remove());
+                        popups = [];
+                    }
+
+                    // Function to clear existing popups
+                    function clearPopups() {
+                        popups.forEach(popup => popup.remove());
+                        popups = [];
+                    }
+                })
+                .catch(error => console.error('Error loading questions:', error));
+        });
+    </script>
+</body>
+</html>
+
