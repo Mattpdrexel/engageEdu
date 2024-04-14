@@ -19,6 +19,8 @@ async def generate_questions(video_link: str):
     video_transcript_data = get_video_transcript(video_id)
 
     # Create loop to try to extract data up to 3 times
+    # This was added since occasionally saw openai api fail to parse data as expected
+    # This seems rare, but added simple loop
     max_attempts = 3
     attempts = 0
     questions = []
