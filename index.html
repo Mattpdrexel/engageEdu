@@ -1,94 +1,87 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video with Questions</title>
-    <style>
-        .popup {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #fff;
-            padding: 20px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Video Quiz</title>
 </head>
 <body>
-    <div id="youtube-video">
-        <!-- Replace 'VIDEO_ID' with your YouTube video ID -->
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/kzJZWO21PVw?si=AzdRtmBvEaKhqt_W" frameborder="0" allowfullscreen></iframe>
-    </div>
+  <div id="player"></div>
+  <div id="questions"></div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Load the questions from the JSON file
-            fetch('questions.json')
-                .then(response => response.json())
-                .then(questions => {
-                    // Initialize variables
-                    let popups = [];
+  <script>
+    // Load the YouTube Player API asynchronously
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-                    // Iterate over each question
-                    questions.forEach(question => {
-                        // Create a popup for each question
-                        const popup = createQuestionPopup(question);
-                        popups.push(popup);
-                    });
+    // Create variables to store YouTube player and questions
+    var player;
+    var questions = [
+      {"index": "Question_1", "timestamp": 59.68, "duration": 11.0, "question": "What is the largest mammal in the world?", "question_type": "Poll", "options": ["Elephant", "Blue whale", "Giraffe", "Rhino"]},
+      {"index": "Question_2", "timestamp": 83.2, "duration": 7.16, "question": "Which country is the second largest population in the world?", "question_type": "Poll", "options": ["China", "India", "The United States", "Brazil"]},
+      {"index": "Question_3", "timestamp": 104.04, "duration": 15.6, "question": "Which of the following animals is not a mammal?", "question_type": "Poll", "options": ["Dog", "Cat", "Bird", "Whale", "Dolphin", "Bat"]},
+      {"index": "Question_4", "timestamp": 121.32, "duration": 8.16, "question": "Which programming language is the best?", "question_type": "Open", "options": []}
+    ];
 
-                    // Reset the counter and clear existing popups when the page is refreshed
-                    window.addEventListener('beforeunload', function() {
-                        resetCounter();
-                        clearPopups();
-                    });
+    // Function to initialize YouTube player
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '360',
+        width: '640',
+        videoId: 'kzJZWO21PVw', // Replace VIDEO_ID with your YouTube video ID
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
 
-                    // Function to create a popup for each question
-                    function createQuestionPopup(question) {
-                        // Create a popup element
-                        const popup = document.createElement('div');
-                        popup.classList.add('popup');
-                        popup.innerHTML = `
-                            <h2>Question ${question.index}</h2>
-                            <p>${question.question}</p>
-                            <p>Question Type: ${question.question_type}</p>
-                            <p>Options: ${question.options.join(', ')}</p>
-                        `;
+    // Function to execute when YouTube player is ready
+    function onPlayerReady(event) {
+      // Start tracking video time
+      setInterval(checkVideoTime, 1000);
+    }
 
-                        // Calculate the time in seconds
-                        const timestampInSeconds = parseFloat(question.timestamp);
+    // Function to check current video time and display questions if needed
+    function checkVideoTime() {
+      var currentTime = player.getCurrentTime();
+      for (var i = 0; i < questions.length; i++) {
+        var question = questions[i];
+        if (currentTime >= question.timestamp && currentTime < question.timestamp + question.duration) {
+          displayQuestion(question);
+        }
+      }
+    }
 
-                        // Set a timeout to show the popup at the specified timestamp
-                        setTimeout(() => {
-                            document.body.appendChild(popup);
-                            // Remove the popup after 5 seconds
-                            setTimeout(() => {
-                                popup.remove();
-                            }, 5000);
-                        }, timestampInSeconds * 1000); // Convert seconds to milliseconds
+    // Function to display a question
+    function displayQuestion(question) {
+      var questionsDiv = document.getElementById('questions');
+      questionsDiv.innerHTML = ''; // Clear previous questions
+      var questionElement = document.createElement('div');
+      questionElement.innerHTML = '<h3>' + question.question + '</h3>';
+      for (var i = 0; i < question.options.length; i++) {
+        var option = question.options[i];
+        var optionElement = document.createElement('input');
+        optionElement.type = 'radio';
+        optionElement.name = 'question_' + question.index;
+        optionElement.value = option;
+        optionElement.id = 'option_' + i;
+        var labelElement = document.createElement('label');
+        labelElement.htmlFor = 'option_' + i;
+        labelElement.textContent = option;
+        questionElement.appendChild(optionElement);
+        questionElement.appendChild(labelElement);
+        questionElement.appendChild(document.createElement('br'));
+      }
+      questionsDiv.appendChild(questionElement);
+    }
 
-                        return popup;
-                    }
-
-                    // Function to reset the counter
-                    function resetCounter() {
-                        popups.forEach(popup => popup.remove());
-                        popups = [];
-                    }
-
-                    // Function to clear existing popups
-                    function clearPopups() {
-                        popups.forEach(popup => popup.remove());
-                        popups = [];
-                    }
-                })
-                .catch(error => console.error('Error loading questions:', error));
-        });
-    </script>
+    // Function to execute when video state changes
+    function onPlayerStateChange(event) {
+      // You can add code here if you need to handle player state changes
+    }
+  </script>
 </body>
 </html>
-
