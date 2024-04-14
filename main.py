@@ -1,52 +1,50 @@
-import json
-from youtube_api import extract_video_id
-from youtube_transcript import get_video_transcript
-from openai_client import generate_response
-from question import extract_questions
 
-# Test links
-video_link_dict = {"main": "https://www.youtube.com/watch?v=kzJZWO21PVw&t",
-                   "main_short": "https://www.youtube.com/shorts/vfbIOZgTers",
-                   "low_quality": "https://www.youtube.com/watch?v=u3wxPCWcDiA&t",
-                   "anqie": "https://www.youtube.com/watch?v=Se5WXQ9Hqhw"}
+from fastapi import FastAPI
 
-# Extract video ID from link
-video_id = extract_video_id(video_link_dict["main"])
+app = FastAPI()
 
-# Fetch video transcript
-video_transcript_data = get_video_transcript(video_id)
 
-# Create loop to try to extract data up to 3 times
-max_attempts = 3
-attempts = 0
-questions = []
+@app.get("/generate_questions/")
+async def generate_questions(video_link: str):
+    import json
+    from youtube_api import extract_video_id
+    from youtube_transcript import get_video_transcript
+    from openai_client import generate_response
+    from question import extract_questions
 
-while attempts < max_attempts:
-    # Generate response
-    response = generate_response(video_transcript_data)
-    print(response)
+    # Extract video ID from link
+    video_id = extract_video_id(video_link)
 
-    response_text = response.choices[0].message.content
+    # Fetch video transcript
+    video_transcript_data = get_video_transcript(video_id)
 
-    # Parse response and create Question objects
-    questions = extract_questions(response_text)
+    # Create loop to try to extract data up to 3 times
+    max_attempts = 3
+    attempts = 0
+    questions = []
 
-    # If questions are not empty, break out of the loop
-    if questions:
-        break
+    while attempts < max_attempts:
+        # Generate response
+        response = generate_response(video_transcript_data)
+        print(response)
 
-    # Increment attempts counter
-    attempts += 1
+        response_text = response.choices[0].message.content
 
-# Check if questions are still empty after maximum attempts
-if not questions:
-    print("Failed to extract questions after maximum attempts.")
-else:
-    # Convert questions to JSON format
-    questions_json = [question.__dict__ for question in questions]
+        # Parse response and create Question objects
+        questions = extract_questions(response_text)
 
-    # Write JSON data to a file
-    with open("questions.json", "w") as json_file:
-        json.dump(questions_json, json_file)
+        # If questions are not empty, break out of the loop
+        if questions:
+            break
 
-# https://www.youtube.com/embed/kzJZWO21PVw?si=AzdRtmBvEaKhqt_W
+        # Increment attempts counter
+        attempts += 1
+
+    # Check if questions are still empty after maximum attempts
+    if not questions:
+        return {"message": "Failed to extract questions after maximum attempts."}
+    else:
+        # Convert questions to JSON format
+        questions_json = [question.__dict__ for question in questions]
+
+        return questions_json
