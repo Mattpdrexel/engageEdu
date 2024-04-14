@@ -46,6 +46,11 @@
 * This would require addressing additional technical questions, such as expanding the video duration that can be analyzed and buidling partnerships with academic institutions to test and refine our application further
 
 # Built With
+* YouTubeTranscriptApi: https://pypi.org/project/youtube-transcript-api/ 
+* openai API: https://openai.com/blog/openai-api
+* Flask: https://flask.palletsprojects.com/en/3.0.x/
+* Postgresql: https://www.postgresql.org/
+
 
 # References
 1. With Online Learning, ‘Let’s Take a Breath and See What Worked and Didn’t Work’: 
